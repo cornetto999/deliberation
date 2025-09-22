@@ -217,6 +217,45 @@ const Teachers = () => {
 
   // P1, P2, and P3 are always available
 
+  // Helper to render a compact, color-coded performance cell for P1/P2/P3
+  const renderPerformance = (teacher: Teacher, period: 'p1' | 'p2' | 'p3') => {
+    const failed = (teacher as any)[`${period}_failed`] as number | undefined;
+    const percent = (teacher as any)[`${period}_percent`] as number | undefined;
+    const category = (teacher as any)[`${period}_category`] as string | undefined;
+
+    const isNA = !failed || failed === 0;
+    const badgeClassName = isNA
+      ? 'bg-blue-500 hover:bg-blue-600 text-white'
+      : category?.includes('RED')
+      ? 'bg-red-500 hover:bg-red-600 text-white'
+      : category?.includes('YELLOW')
+      ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+      : 'bg-green-500 hover:bg-green-600 text-white';
+
+    const percentText = percent && !isNaN(Number(percent)) ? `${Number(percent).toFixed(1)}%` : 'N/A';
+    const badgeLabel = isNA ? 'N/A' : category || 'N/A';
+
+    return (
+      <div className="space-y-1">
+        <div className="text-sm">Failed: {failed || 0}</div>
+        <div className="text-xs text-muted-foreground">{percentText}</div>
+        <Badge className={`text-xs ${badgeClassName}`}>{badgeLabel}</Badge>
+      </div>
+    );
+  };
+
+  // Helper to render categorization badge only
+  const renderCategoryBadge = (category?: string) => {
+    const badgeClassName = !category
+      ? 'bg-blue-500 hover:bg-blue-600 text-white'
+      : category.includes('RED')
+      ? 'bg-red-500 hover:bg-red-600 text-white'
+      : category.includes('YELLOW')
+      ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+      : 'bg-green-500 hover:bg-green-600 text-white';
+    return <Badge className={`text-xs ${badgeClassName}`}>{category || 'N/A'}</Badge>;
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -715,35 +754,35 @@ const Teachers = () => {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="bg-white text-black">
                   {visibleColumns.teacher_id && (
                     <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="cursor-pointer text-black hover:bg-muted/50"
                       onClick={() => handleSort('teacher_id')}
                     >
-                      <div className="flex items-center gap-1">
-                        Teacher ID
+                      <div className="flex items-center gap-1 font-semibold">
+                        Faculty Number
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
                   )}
                   {visibleColumns.name && (
                     <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="cursor-pointer text-black hover:bg-muted/50"
                       onClick={() => handleSort('first_name')}
                     >
-                      <div className="flex items-center gap-1">
-                        Name
+                      <div className="flex items-center gap-1 font-semibold">
+                        Faculty Name
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
                   )}
                   {visibleColumns.department && (
                     <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="cursor-pointer text-black hover:bg-muted/50"
                       onClick={() => handleSort('department')}
                     >
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 font-semibold">
                         Department
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
@@ -751,37 +790,49 @@ const Teachers = () => {
                   )}
                   {visibleColumns.enrolled && (
                     <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="cursor-pointer text-black hover:bg-muted/50"
                       onClick={() => handleSort('enrolled_students')}
                     >
-                      <div className="flex items-center gap-1">
-                        Enrolled
+                      <div className="flex items-center gap-1 font-semibold">
+                        Number of Enrolled Students
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
                   )}
                   {visibleColumns.p1_performance && (
-                    <TableHead>P1 Performance</TableHead>
+                    <>
+                      <TableHead className="text-black hover:bg-muted/50 font-semibold">P1 Number of Failed</TableHead>
+                      <TableHead className="text-black hover:bg-muted/50 font-semibold">P1 % of Failed</TableHead>
+                      <TableHead className="text-black hover:bg-muted/50 font-semibold">P1 Categorization</TableHead>
+                    </>
                   )}
                   {visibleColumns.p2_performance && (
-                    <TableHead>P2 Performance</TableHead>
+                    <>
+                      <TableHead className="text-black hover:bg-muted/50 font-semibold">P2 Number of Failed</TableHead>
+                      <TableHead className="text-black hover:bg-muted/50 font-semibold">P2 % of Failed</TableHead>
+                      <TableHead className="text-black hover:bg-muted/50 font-semibold">P2 Categorization</TableHead>
+                    </>
                   )}
                   {visibleColumns.p3_performance && (
-                    <TableHead>P3 Performance</TableHead>
+                    <>
+                      <TableHead className="text-black hover:bg-muted/50 font-semibold">P3 Number of Failed</TableHead>
+                      <TableHead className="text-black hover:bg-muted/50 font-semibold">P3 % of Failed</TableHead>
+                      <TableHead className="text-black hover:bg-muted/50 font-semibold">P3 Categorization</TableHead>
+                    </>
                   )}
                   {visibleColumns.zone && (
                     <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="cursor-pointer text-black hover:bg-muted/50"
                       onClick={() => handleSort('zone')}
                     >
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 font-semibold">
                         Zone
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
                   )}
                   {visibleColumns.actions && (
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="text-black hover:bg-muted/50 font-semibold">Actions</TableHead>
                   )}
                 </TableRow>
               </TableHeader>
@@ -818,43 +869,31 @@ const Teachers = () => {
                       </TableCell>
                     )}
                     {visibleColumns.p1_performance && (
-                      <TableCell>
-                        <div className="text-sm">
-                          <div>Failed: {teacher.p1_failed || 0}</div>
-                          <div className="text-muted-foreground">
-                            {teacher.p1_percent && !isNaN(Number(teacher.p1_percent)) ? `${Number(teacher.p1_percent).toFixed(1)}%` : 'N/A'}
-                          </div>
-                          <Badge variant="outline" className="text-xs">
-                            {teacher.p1_category || 'N/A'}
-                          </Badge>
-                        </div>
-                      </TableCell>
+                      <>
+                        <TableCell>{teacher.p1_failed ?? 0}</TableCell>
+                        <TableCell>
+                          {typeof teacher.p1_percent === 'number' ? `${teacher.p1_percent.toFixed(1)}%` : 'N/A'}
+                        </TableCell>
+                        <TableCell>{renderCategoryBadge(teacher.p1_category)}</TableCell>
+                      </>
                     )}
                     {visibleColumns.p2_performance && (
-                      <TableCell>
-                        <div className="text-sm">
-                          <div>Failed: {teacher.p2_failed || 0}</div>
-                          <div className="text-muted-foreground">
-                            {teacher.p2_percent && !isNaN(Number(teacher.p2_percent)) ? `${Number(teacher.p2_percent).toFixed(1)}%` : 'N/A'}
-                          </div>
-                          <Badge variant="outline" className="text-xs">
-                            {teacher.p2_category || 'N/A'}
-                          </Badge>
-                        </div>
-                      </TableCell>
+                      <>
+                        <TableCell>{teacher.p2_failed ?? 0}</TableCell>
+                        <TableCell>
+                          {typeof teacher.p2_percent === 'number' ? `${teacher.p2_percent.toFixed(1)}%` : 'N/A'}
+                        </TableCell>
+                        <TableCell>{renderCategoryBadge(teacher.p2_category)}</TableCell>
+                      </>
                     )}
                     {visibleColumns.p3_performance && (
-                      <TableCell>
-                        <div className="text-sm">
-                          <div>Failed: {teacher.p3_failed || 0}</div>
-                          <div className="text-muted-foreground">
-                            {teacher.p3_percent && !isNaN(Number(teacher.p3_percent)) ? `${Number(teacher.p3_percent).toFixed(1)}%` : 'N/A'}
-                          </div>
-                          <Badge variant="outline" className="text-xs">
-                            {teacher.p3_category || 'N/A'}
-                          </Badge>
-                        </div>
-                      </TableCell>
+                      <>
+                        <TableCell>{teacher.p3_failed ?? 0}</TableCell>
+                        <TableCell>
+                          {typeof teacher.p3_percent === 'number' ? `${teacher.p3_percent.toFixed(1)}%` : 'N/A'}
+                        </TableCell>
+                        <TableCell>{renderCategoryBadge(teacher.p3_category)}</TableCell>
+                      </>
                     )}
                     {visibleColumns.zone && (
                       <TableCell>
