@@ -135,6 +135,7 @@ function processGradeData($data, $conn) {
     $existingStudents = [];
     $existingSubjects = [];
     $existingTeachers = [];
+    $teacherIdMap = []; // Map teacher names to their IDs
     
     foreach ($data as $row) {
         try {
@@ -180,14 +181,30 @@ function processGradeData($data, $conn) {
                     'first_name' => $teacherFirstName,
                     'last_name' => $teacherLastName,
                     'email' => strtolower(str_replace(' ', '.', $teacherName)) . '@school.edu',
-                    'department' => 'Information Technology'
+                    'department' => 'Information Technology',
+                    'p1_failed' => 0,
+                    'p1_percent' => 0.00,
+                    'p1_category' => 'GREEN (0.01%-10%)',
+                    'p2_failed' => 0,
+                    'p2_percent' => 0.00,
+                    'p2_category' => 'GREEN (0.01%-10%)',
+                    'p3_failed' => 0,
+                    'p3_percent' => 0.00,
+                    'p3_category' => 'GREEN (0.01%-10%)'
                 ];
                 
                 try {
-                    $teacher->create($teacherData);
+                    $teacherId = $teacher->create($teacherData);
                     $teachersCreated++;
+                    $teacherIdMap[$teacherName] = $teacherId;
                 } catch (Exception $e) {
-                    // Teacher might already exist, continue
+                    // Teacher might already exist, try to find existing teacher
+                    $stmt = $conn->prepare('SELECT id FROM teachers WHERE first_name = ? AND last_name = ?');
+                    $stmt->execute([$teacherFirstName, $teacherLastName]);
+                    $existingTeacher = $stmt->fetch();
+                    if ($existingTeacher) {
+                        $teacherIdMap[$teacherName] = $existingTeacher['id'];
+                    }
                 }
                 
                 $existingTeachers[$teacherName] = true;
@@ -220,22 +237,36 @@ function processGradeData($data, $conn) {
             // Process grade
             $gradeValue = $row['grade'];
             if ($gradeValue !== 'NA' && $gradeValue !== '-' && !empty($gradeValue)) {
-                $gradeData = [
-                    'student_id' => $studentId,
-                    'subject_code' => $subjectCode,
-                    'academic_year' => $row['academic_year'],
-                    'semester' => $row['year_semester'],
-                    'midterm_grade' => null,
-                    'final_grade' => (float)$gradeValue,
-                    'final_rating' => (float)$gradeValue,
-                    'status' => (float)$gradeValue >= 60 ? 'Passed' : 'Failed'
-                ];
+                // Get the actual student and subject IDs
+                $stmt = $conn->prepare('SELECT id FROM students WHERE student_id = ?');
+                $stmt->execute([$studentId]);
+                $studentRecord = $stmt->fetch();
                 
-                try {
-                    $grade->create($gradeData);
-                    $count++;
-                } catch (Exception $e) {
-                    $errors[] = "Grade for {$studentId} in {$subjectCode}: " . $e->getMessage();
+                $stmt = $conn->prepare('SELECT id FROM subjects WHERE subject_code = ?');
+                $stmt->execute([$subjectCode]);
+                $subjectRecord = $stmt->fetch();
+                
+                if ($studentRecord && $subjectRecord && isset($teacherIdMap[$teacherName])) {
+                    $gradeData = [
+                        'student_id' => $studentRecord['id'],
+                        'subject_id' => $subjectRecord['id'],
+                        'teacher_id' => $teacherIdMap[$teacherName],
+                        'academic_year' => $row['academic_year'],
+                        'semester' => $row['year_semester'],
+                        'midterm_grade' => null,
+                        'final_grade' => (float)$gradeValue,
+                        'final_rating' => (float)$gradeValue,
+                        'status' => (float)$gradeValue >= 60 ? 'Passed' : 'Failed'
+                    ];
+                    
+                    try {
+                        $grade->create($gradeData);
+                        $count++;
+                    } catch (Exception $e) {
+                        $errors[] = "Grade for {$studentId} in {$subjectCode}: " . $e->getMessage();
+                    }
+                } else {
+                    $errors[] = "Missing student, subject, or teacher record for {$studentId} in {$subjectCode}";
                 }
             }
             
@@ -244,11 +275,24 @@ function processGradeData($data, $conn) {
         }
     }
     
+    // Update teacher failure statistics
+    $teachersUpdated = 0;
+    foreach ($teacherIdMap as $teacherName => $teacherId) {
+        try {
+            if ($teacher->updateFailureStats($teacherId)) {
+                $teachersUpdated++;
+            }
+        } catch (Exception $e) {
+            $errors[] = "Failed to update failure stats for teacher {$teacherName}: " . $e->getMessage();
+        }
+    }
+    
     return [
         'count' => $count,
         'students_created' => $studentsCreated,
         'subjects_created' => $subjectsCreated,
         'teachers_created' => $teachersCreated,
+        'teachers_updated' => $teachersUpdated,
         'errors' => $errors
     ];
 }
