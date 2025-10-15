@@ -31,6 +31,7 @@ import {
 import { Plus, Search, AlertTriangle, Edit, Eye, Loader2, Upload, Download } from "lucide-react";
 import ZoneBadge from "@/components/ZoneBadge";
 import { useToast } from "@/hooks/use-toast";
+import { apiUrl } from "@/lib/api";
 
 interface Student {
   id: number;
@@ -78,7 +79,7 @@ const Students = () => {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost/deliberation/routes/students.php');
+      const response = await fetch(apiUrl('students.php'));
       const data = await response.json();
       setStudents(data);
     } catch (error) {
@@ -158,7 +159,7 @@ const Students = () => {
         at_risk: newStudent.at_risk
       };
 
-      const response = await fetch('http://localhost/deliberation/routes/students.php', {
+      const response = await fetch(apiUrl('students.php'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -250,7 +251,7 @@ const Students = () => {
         });
       }, 200);
 
-      const response = await fetch('http://localhost/deliberation/routes/upload.php', {
+      const response = await fetch(apiUrl('upload.php'), {
         method: 'POST',
         body: formData
       });

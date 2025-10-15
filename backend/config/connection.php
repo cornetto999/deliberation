@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../load_env.php';
+
 class DatabaseConnection {
     private PDO $pdo;
 
     public function __construct() {
         $host = getenv('DB_HOST') ?: '127.0.0.1';
         $port = getenv('DB_PORT') ?: '3306';
-        $db   = getenv('DB_NAME') ?: 'school_db';
+        $db   = getenv('DB_NAME') ?: 'deliberation';
         $user = getenv('DB_USER') ?: 'root';
         $pass = getenv('DB_PASS') ?: '';
         $charset = 'utf8mb4';

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
+import { apiUrl } from "@/lib/api";
 
 interface DashboardStats {
   totalStudents: number;
@@ -49,15 +50,15 @@ const Dashboard = () => {
       setLoading(true);
       
       // Fetch students data
-      const studentsResponse = await fetch('http://localhost/deliberation/routes/students.php');
+      const studentsResponse = await fetch(apiUrl('students.php'));
       const students = await studentsResponse.json();
       
       // Fetch teachers data
-      const teachersResponse = await fetch('http://localhost/deliberation/routes/teachers.php');
+      const teachersResponse = await fetch(apiUrl('teachers.php'));
       const teachers = await teachersResponse.json();
       
       // Fetch subjects data
-      const subjectsResponse = await fetch('http://localhost/deliberation/routes/subjects.php');
+      const subjectsResponse = await fetch(apiUrl('subjects.php'));
       const subjects = await subjectsResponse.json();
 
       // Calculate stats

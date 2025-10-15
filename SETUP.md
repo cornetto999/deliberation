@@ -42,7 +42,7 @@ This project includes a React frontend and PHP backend for a school deliberation
    ```
 
 3. **Access Application**
-   - Open your browser and go to: `http://localhost:5173`
+   - Open your browser and go to: `http://localhost:8080`
    - You'll be redirected to the login page
    - Use the admin credentials to log in
 
@@ -92,14 +92,26 @@ ds/
    - Ensure Node.js dependencies are installed
    - Check that the development server is running on port 5173
 
+## Environment Configuration
+
+Create a `.env` file in the project root (you can copy from `.env.example`) to configure both frontend and backend:
+
+- Frontend (Vite):
+  - `VITE_API_BASE_URL` should point to your backend base URL without a trailing slash.
+    - Example (XAMPP Apache): `http://localhost/deliberation`
+    - Example (PHP built-in server): `http://localhost:8000/backend`
+
+- Backend (PHP):
+  - Database variables used by the backend: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`
+  - If these are not set, sensible defaults are used (`127.0.0.1`, `3306`, `deliberation`, `root`, empty password).
+
+The backend automatically loads `.env` at runtime.
+
 ## Development
 
-- Frontend runs on `http://localhost:5173`
+- Frontend runs on `http://localhost:8080`
 - Backend API runs on `http://localhost/deliberation/`
 - Database: MySQL via XAMPP
-
-
-
 
 
 

@@ -30,6 +30,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, Edit, Eye, Loader2, BookOpen, User, TrendingUp, TrendingDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { apiUrl } from "@/lib/api";
 
 interface Grade {
   id: number;
@@ -114,9 +115,9 @@ const Grades = () => {
     try {
       setLoading(true);
       const [gradesRes, studentsRes, subjectsRes] = await Promise.all([
-        fetch('http://localhost/deliberation/routes/grades.php'),
-        fetch('http://localhost/deliberation/routes/students.php'),
-        fetch('http://localhost/deliberation/routes/subjects.php')
+        fetch(apiUrl('grades.php')),
+        fetch(apiUrl('students.php')),
+        fetch(apiUrl('subjects.php'))
       ]);
       
       const [gradesData, studentsData, subjectsData] = await Promise.all([
@@ -175,7 +176,7 @@ const Grades = () => {
         final_rating: newGrade.final_rating ? parseFloat(newGrade.final_rating) : null,
       };
 
-      const response = await fetch('http://localhost/deliberation/routes/grades.php', {
+      const response = await fetch(apiUrl('grades.php'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

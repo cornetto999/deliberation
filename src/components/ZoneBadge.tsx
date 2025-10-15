@@ -12,17 +12,18 @@ const ZoneBadge = ({ zone, className }: ZoneBadgeProps) => {
       case "green":
         return {
           label: "Green Zone",
-          className: "bg-zone-green-light text-zone-green border-zone-green/20",
+          // Stronger, more legible styling
+          className: "bg-zone-green text-white border-zone-green hover:bg-zone-green/90",
         };
       case "yellow":
         return {
           label: "Yellow Zone",
-          className: "bg-zone-yellow-light text-zone-yellow border-zone-yellow/20",
+          className: "bg-zone-yellow text-black border-zone-yellow hover:bg-zone-yellow/90",
         };
       case "red":
         return {
           label: "Red Zone",
-          className: "bg-zone-red-light text-zone-red border-zone-red/20",
+          className: "bg-zone-red text-white border-zone-red hover:bg-zone-red/90",
         };
       default:
         return {
@@ -36,7 +37,7 @@ const ZoneBadge = ({ zone, className }: ZoneBadgeProps) => {
 
   return (
     <Badge
-      variant="outline"
+      variant="default"
       className={cn(config.className, className)}
     >
       {config.label}

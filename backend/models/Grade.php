@@ -71,14 +71,13 @@ class GradeModel {
 
     public function create(array $data): int {
         $stmt = $this->pdo->prepare('
-            INSERT INTO student_grades (student_id, subject_id, teacher_id, academic_year, semester, 
+            INSERT INTO student_grades (student_id, subject_id, academic_year, semester, 
                                       midterm_grade, final_grade, final_rating, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ');
         $stmt->execute([
             $data['student_id'] ?? null,
             $data['subject_id'] ?? null,
-            $data['teacher_id'] ?? null,
             $data['academic_year'] ?? date('Y') . '-' . (date('Y') + 1),
             $data['semester'] ?? '1st',
             $data['midterm_grade'] ?? null,
@@ -100,10 +99,6 @@ class GradeModel {
         if (isset($data['subject_id'])) {
             $fields[] = 'subject_id = ?';
             $values[] = $data['subject_id'];
-        }
-        if (isset($data['teacher_id'])) {
-            $fields[] = 'teacher_id = ?';
-            $values[] = $data['teacher_id'];
         }
         if (isset($data['academic_year'])) {
             $fields[] = 'academic_year = ?';
@@ -145,8 +140,6 @@ class GradeModel {
         return $stmt->execute([$id]);
     }
 }
-
-
 
 
 

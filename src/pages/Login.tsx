@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -32,7 +33,7 @@ const Login = () => {
     setError("");
 
     try {
-      const response = await fetch('http://localhost/deliberation/routes/login.php', {
+      const response = await fetch(apiUrl('login.php'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

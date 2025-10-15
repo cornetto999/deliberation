@@ -31,6 +31,7 @@ import {
 import { Plus, Search, BookOpen, Edit, Eye, Loader2, Upload, Download } from "lucide-react";
 import ZoneBadge from "@/components/ZoneBadge";
 import { useToast } from "@/hooks/use-toast";
+import { apiUrl } from "@/lib/api";
 
 interface Subject {
   id: number;
@@ -94,7 +95,7 @@ const Subjects = () => {
   const fetchSubjects = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost/deliberation/routes/subjects.php');
+      const response = await fetch(apiUrl('subjects.php'));
       if (!response.ok) {
         throw new Error('Failed to fetch subjects');
       }
@@ -134,7 +135,7 @@ const Subjects = () => {
 
   const handleAddSubject = async () => {
     try {
-      const response = await fetch('http://localhost/deliberation/routes/subjects.php', {
+      const response = await fetch(apiUrl('subjects.php'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -230,7 +231,7 @@ const Subjects = () => {
         });
       }, 200);
 
-      const response = await fetch('http://localhost/deliberation/routes/upload.php', {
+      const response = await fetch(apiUrl('upload.php'), {
         method: 'POST',
         body: formData
       });
